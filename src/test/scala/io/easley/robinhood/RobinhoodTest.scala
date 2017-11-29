@@ -11,12 +11,12 @@ class RobinhoodTest extends FunSuite {
   val robinhood = new Robinhood
 
   test("Robinhood should get user account token ") {
-    Await.result(robinhood.login("", ""), 10 seconds)
-    val res =
-      Await.result(robinhood.placeBuyOrder(
-                     Order(symbol = "AAPL", bid_price = 173.10, quantity = 1)),
-                   10 seconds)
-    println(res)
+
+//    val res =
+//      Await.result(robinhood.placeBuyOrder(
+//                     Order(symbol = "AAPL", bid_price = 173.10, quantity = 1)),
+//                   10 seconds)
+//    println(res)
 //    val ip = Await.result(robinhood.getInvestmentProfile(), 10 seconds)
 //    println(ip)
 //    assert(robinhood.isUserLoggedIn(), true)

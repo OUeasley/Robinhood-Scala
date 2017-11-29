@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % "2.5.4", // or whatever the latest version is,
   "com.typesafe.akka" %% "akka-actor" % "2.5.4", // or whatever the latest version is
   "com.typesafe.play" %% "play-json" % "2.6.7",
-  "de.heikoseeberger" %% "akka-http-play-json" % "1.18.1git remote add origin https://github.com/OUeasley/Robinhood-Scala.git\ngit push -u origin master",
+  "de.heikoseeberger" %% "akka-http-play-json" % "1.18.1",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
   "org.scalactic" %% "scalactic" % "3.0.4",
