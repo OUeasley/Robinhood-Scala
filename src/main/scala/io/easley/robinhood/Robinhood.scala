@@ -17,9 +17,11 @@ import io.easley.robinhood.Trigger.Trigger
 import play.api.libs.json._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import ai.x.play.json.Jsonx
+import akka.http.scaladsl.server.{RejectionError, ValidationRejection}
 
+import scala.concurrent.duration._
 import scala.util.control.Exception
 
 class Robinhood {
@@ -51,9 +53,14 @@ class Robinhood {
   }
 
   def getInstrument(symbol: String) = {
-    makeGetRequest(uri = s"${Endpoints.INSTRUMENTS}$symbol/")
-      .flatMap(resp => Unmarshal(resp).to[InstrumentArray])
+    makeGetRequest(uri = s"${Endpoints.INSTRUMENTS}?query=$symbol")
+      .flatMap(resp => {
+        val entity = Await.result(resp.entity.toStrict(10 seconds), 10 seconds)
+        val str = entity.getData().utf8String
+        Unmarshal(resp).to[InstrumentArray]
+      })
       .map(ia => ia.results.head)
+
   }
 
   def getOrder(orderId: String) = {
@@ -258,21 +265,25 @@ object Instrument {
 }
 
 case class Instrument(min_tick_size: String,
+                      `type`: String,
                       splits: String,
                       margin_initial_ratio: String,
                       url: String,
                       quote: String,
-                      symbol: String,
+                      tradability: String,
                       bloomberg_unique: String,
                       list_date: String,
+                      name: String,
+                      symbol: String,
                       fundamentals: String,
                       state: String,
+                      country: String,
                       day_trade_ratio: String,
                       tradeable: Boolean,
                       maintenance_ratio: String,
                       id: String,
                       market: String,
-                      name: String)
+                      simple_name: String)
 
 object InstrumentArray {
   implicit val authFormat: Format[InstrumentArray] =
@@ -280,7 +291,7 @@ object InstrumentArray {
 }
 
 case class InstrumentArray(previous: String,
-                           results: Seq[Instrument],
+                           results: List[Instrument],
                            next: String)
 
 object InvestmentProfile {
@@ -309,12 +320,12 @@ object Order {
 
 case class Order(`type`: String = "limit",
                  symbol: String,
-                 side: String,
-                 account: String,
+                 side: String = "",
+                 account: String = "",
                  stop_price: Double = Double.NaN,
                  quantity: Int,
                  bid_price: Double,
-                 instrument: String,
+                 instrument: String = "",
                  trigger: String = Trigger.GOOD_FOR_DAY.toString,
                  time: String = Time.IMMEDIATE.toString) {}
 
