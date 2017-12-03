@@ -41,6 +41,7 @@ class Robinhood {
     makeGetRequest(uri = Endpoints.ACCOUNTS)
       .flatMap(resp => {
         Unmarshal(resp).to[AccountArray]
+
       })
       .map(aa => {
         val account = aa.results.head
@@ -52,6 +53,7 @@ class Robinhood {
   def getAccount() = {
     acct
   }
+
 
   def getInvestmentProfile() = {
     makeGetRequest(uri = Endpoints.INVESTMENT_PROFILE)
@@ -79,10 +81,38 @@ class Robinhood {
                    account = acct.url,
                    side = "buy")
       })
-      .flatMap(order => Marshal(order).to[RequestEntity])
-      .flatMap(requestEntity => {
-        makePostRequest(entity = requestEntity, uri = Endpoints.ORDERS)
+      .map(order => {
+        val orderJson = Json.toJson(order)
+        HttpEntity(ContentTypes.`application/json`,orderJson.toString())
       })
+      .flatMap(requestEntity => {
+        makePostRequest(entity = requestEntity, uri = Endpoints.ORDERS,headers = getHeadersJson())
+      }).map(resp => {
+      Unmarshal(resp).to[SecurityOrderElement]
+    })
+  }
+
+  def placeSellOrder(order: Order) = {
+    getInstrument(order.symbol)
+      .map(instrument => {
+        order.copy(instrument = instrument.url,
+          account = acct.url,
+          side = "sell")
+      })
+      .map(order => {
+        val orderJson = Json.toJson(order)
+        HttpEntity(ContentTypes.`application/json`,orderJson.toString())
+      })
+      .flatMap(requestEntity => {
+        makePostRequest(entity = requestEntity, uri = Endpoints.ORDERS,headers = getHeadersJson())
+      }).map(resp => {
+      Unmarshal(resp).to[SecurityOrderElement]
+    })
+  }
+
+  def cancelOrder(orderId : String) ={
+    makePostRequest(uri = s"${Endpoints.ORDERS}$orderId/cancel/",headers = getHeadersJson()).flatMap(resp =>
+      Unmarshal(resp).to[SecurityOrderElement])
   }
 
   def login(username: String, password: String) = {
@@ -123,6 +153,14 @@ class Robinhood {
     Http().singleRequest(request)
   }
 
+  def getHeadersJson() = {
+    if (isLoggedIn) {
+      headersJson.:+(RawHeader("Authorization", "Token " + authToken))
+    } else {
+      headersJson
+    }
+  }
+
   def getHeaders() = {
     if (isLoggedIn) {
         headers.:+(RawHeader("Authorization", "Token " + authToken))
@@ -160,6 +198,7 @@ class Robinhood {
   }
 
   private def makePostRequest(entity: RequestEntity = HttpEntity.Empty,
+                              headers : Seq[HttpHeader] = getHeaders(),
                               uri: String = "") = {
     makeRequest(
       HttpRequest(method = HttpMethods.POST,
@@ -186,15 +225,32 @@ object Robinhood {
       RawHeader("Accept", "*/*"),
       RawHeader("Accept-Encoding", "gzip, deflate"),
       RawHeader("Accept-Language",
-                "en;q=1, fr;q=0.9, de;q=0.8, ja;q=0.7, nl;q=0.6, it;q=0.5"),
+        "en;q=1, fr;q=0.9, de;q=0.8, ja;q=0.7, nl;q=0.6, it;q=0.5"),
       RawHeader("Content-Type",
-                "application/x-www-form-urlencoded; charset=utf-8"),
+        "application/x-www-form-urlencoded; charset=utf-8"),
       RawHeader("Connection", "keep-alive"),
       RawHeader("X-Robinhood-API-Version", "1.152.0"),
       RawHeader(
         "User-Agent",
         "Robinhood/5.32.0 (com.robinhood.release.Robinhood; build:3814; iOS 10.3.3)")
     )
+
+
+  var headersJson: scala.collection.immutable.Seq[HttpHeader] =
+    scala.collection.immutable.Seq(
+      RawHeader("Accept", "*/*"),
+      RawHeader("Accept-Encoding", "gzip, deflate"),
+      RawHeader("Accept-Language",
+        "en;q=1, fr;q=0.9, de;q=0.8, ja;q=0.7, nl;q=0.6, it;q=0.5"),
+      RawHeader("Content-Type",
+        "application/json"),
+      RawHeader("Connection", "keep-alive"),
+      RawHeader("X-Robinhood-API-Version", "1.152.0"),
+      RawHeader(
+        "User-Agent",
+        "Robinhood/5.32.0 (com.robinhood.release.Robinhood; build:3814; iOS 10.3.3)")
+    )
+
   var isLoggedIn = false
   var authToken = ""
   var acct: Account = _

@@ -16,6 +16,7 @@ libraryDependencies ++= Seq(
   // Only when running against Akka 2.5 explicitly depend on akka-streams in same version as akka-actor
   "com.typesafe.akka" %% "akka-stream" % "2.5.4", // or whatever the latest version is,
   "com.typesafe.akka" %% "akka-actor" % "2.5.4", // or whatever the latest version is
+  "com.typesafe.akka" %% "akka-testkit" % "2.5.4", // or whatever the latest version is
   "com.typesafe.play" %% "play-json" % "2.6.7",
   "de.heikoseeberger" %% "akka-http-play-json" % "1.18.1",
   "ch.qos.logback" % "logback-classic" % "1.2.3",

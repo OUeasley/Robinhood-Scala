@@ -8,13 +8,15 @@ object Order {
     Json.format[Order]
 }
 
-case class Order(`type`: String = "limit",
-                 symbol: String,
-                 side: String = "",
-                 account: String = "",
-                 stop_price: Double = Double.NaN,
-                 quantity: Int,
-                 bid_price: Double,
-                 instrument: String = "",
-                 trigger: String = Trigger.GOOD_FOR_DAY.toString,
-                 time: String = Time.IMMEDIATE.toString) {}
+case class Order(
+                  account: String = "",
+                  instrument: String = "",
+                  price: Double,
+                  quantity: Int,
+                  side: String = "",
+                  symbol: String,
+                  time_in_force: String = Trigger.GOOD_FOR_DAY.toString,
+                  trigger: String = Time.IMMEDIATE.toString,
+                  `type`: String = "limit",
+                 stop_price: Option[Double] = None
+                 ) {}

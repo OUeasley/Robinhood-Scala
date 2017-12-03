@@ -1,5 +1,6 @@
 package io.easley.robinhood
 
+import io.easley.robinhood.models._
 import org.scalatest.{FunSuite, Outcome}
 
 import scala.concurrent.duration._
@@ -12,15 +13,19 @@ class RobinhoodTest extends FunSuite {
 
   test("Robinhood should get user account token ") {
 
-//    val res =
-//      Await.result(robinhood.placeBuyOrder(
-//                     Order(symbol = "AAPL", bid_price = 173.10, quantity = 1)),
-//                   10 seconds)
-//    println(res)
-//    val ip = Await.result(robinhood.getInvestmentProfile(), 10 seconds)
-//    println(ip)
-//    assert(robinhood.isUserLoggedIn(), true)
-//    assert(!robinhood.getToken().isEmpty, true)
+      robinhood.setUserLoggedIn()
+      val res0 = Await.result(robinhood.getAccounts(), 10 seconds)
+      println(res0)
+
+      val res =
+        Await.result(robinhood.cancelOrder(order),
+          10 seconds)
+
+      println(res)
+      //    val ip = Await.result(robinhood.getInvestmentProfile(), 10 seconds)
+      //    println(ip)/",
+      //    assert(robinhood.isUserLoggedIn(), true)
+      //    assert(!robinhood.getToken().isEmpty, true)
   }
 
 }
