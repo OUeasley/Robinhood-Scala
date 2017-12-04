@@ -69,7 +69,7 @@ class Robinhood {
   }
 
   def getOrder(orderId: String) = {
-    makeGetRequest(uri = s"${Endpoints.ORDERS}$orderId").flatMap(resp =>
+    makeGetRequest(uri = s"${Endpoints.ORDERS}$orderId/",headers = getHeadersJson()).flatMap(resp =>
       Unmarshal(resp).to[SecurityOrderElement])
   }
 
@@ -204,20 +204,20 @@ class Robinhood {
   }
 
   private def makePostRequest(entity: RequestEntity = HttpEntity.Empty,
-                              headers: Seq[HttpHeader] = getHeaders(),
+                              headers: scala.collection.immutable.Seq[HttpHeader] = getHeaders(),
                               uri: String = "") = {
     makeRequest(
       HttpRequest(method = HttpMethods.POST,
-                  headers = getHeaders(),
+                  headers = headers,
                   entity = entity,
                   uri = Endpoints.BASE_URL + uri))
   }
 
-  private def makeGetRequest(entity: RequestEntity = HttpEntity.Empty,
+  private def makeGetRequest(entity: RequestEntity = HttpEntity.Empty, headers : scala.collection.immutable.Seq[HttpHeader] = getHeaders(),
                              uri: String = "") = {
     makeRequest(
       HttpRequest(method = HttpMethods.GET,
-                  headers = getHeaders(),
+                  headers = headers,
                   entity = entity,
                   uri = Endpoints.BASE_URL + uri))
   }

@@ -13,7 +13,7 @@ case class SecurityOrderElement(
                                 ref_id : Option[String],
                                 time_in_force : String,
                                 fees: String,
-                                cancel : String,
+                                cancel : Option[String],
                                 id : String,
                                 cumulative_quantity : String,
                                 stop_price : Option[String],

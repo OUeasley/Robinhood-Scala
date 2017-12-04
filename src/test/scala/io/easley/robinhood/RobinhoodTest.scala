@@ -10,6 +10,7 @@ import scala.concurrent.Await
 
 class RobinhoodTest extends FunSuite {
   val robinhood = new Robinhood
-  test("Robinhood should get user account token ") {}
+  test("Robinhood should get user account token ") {
+  }
 
 }
