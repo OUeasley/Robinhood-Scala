@@ -203,6 +203,13 @@ class Robinhood {
     authToken = ""
   }
 
+  def loginWithToken(token : String) = {
+    authToken = token
+    isLoggedIn = true
+    getAccounts()
+    logger.info("User is logged in.")
+  }
+
   private def makePostRequest(entity: RequestEntity = HttpEntity.Empty,
                               headers: scala.collection.immutable.Seq[HttpHeader] = getHeaders(),
                               uri: String = "") = {
